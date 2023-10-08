@@ -1,6 +1,5 @@
 # "python script.py <num_iterations> "<command>""
 
-# srun -p ece5755 -n 1 --mem=1g -w slurm-instructional-compute-01 --pty /bin/bash
 import subprocess
 import sys
 import csv
@@ -42,7 +41,7 @@ def main(num_iterations, command):
                 if key in line:
                     data[key].append(float('.'.join(re.findall(r'\d+\.\d+|\d+', line))))
         
-    filename = 'rul.csv'
+    filename = 'Block_matmul_profile_256.csv'
 
     with open(filename, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
@@ -66,5 +65,6 @@ if __name__ == "__main__":
 
     main(num_iterations, command)
 
+# srun -p ece5755 -n 1 --mem=1g -w slurm-instructional-compute-01 --pty /bin/bash
 
 

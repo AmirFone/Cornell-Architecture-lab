@@ -23,7 +23,7 @@ void test_matmul_square_matrices(void)
     }
 
     
-    float **C = matmul(A, B, 2, 2, 2, 2);
+    float **C = matmul_blocking(A, B, 2, 2, 2, 2);
 
     // Check expectations
     UNITY_TEST_ASSERT_EQUAL_FLOAT(9.0, C[0][0], __LINE__, "Expected 9.0");
@@ -65,7 +65,7 @@ void test_matmul_incompatible_dimensions(void)
     }
 
     // Run function under test
-    float **C = matmul(A, B, 2, 3, 2, 2);
+    float **C = matmul_blocking(A, B, 2, 3, 2, 2);
 
     // Check expectations
     UNITY_TEST_ASSERT_NULL(C, __LINE__, "Expected NULL!");
@@ -102,7 +102,7 @@ void test_matmul_three_by_three_matrices(void)
         B[i][2] = 1.0;
     }
 
-    float **C = matmul(A, B, 3, 3, 3, 3);
+    float **C = matmul_blocking(A, B, 3, 3, 3, 3);
 
     // Check expectations
     UNITY_TEST_ASSERT_EQUAL_FLOAT(39.0, C[0][0], __LINE__, "Expected 39.0");
