@@ -110,14 +110,13 @@ float **matmul_blocking(float **A, float **B, int A_rows, int A_cols, int B_rows
 //         //     return 1;
 //         // }
 
-//         // Calculate the elapsed time in milliseconds
+//         // Calculating the elapsed time in milliseconds
 //         // double elapsed_time = (double)(end_time - start_time) * 1000.0 / CLOCKS_PER_SEC;
 
 //         // printf("Iteration %d: Wall-Clock Time %.2f ms\n", i, elapsed_time);
 
 //         // fprintf(csvFile, "%d,%.2f\n", i, elapsed_time);
 
-//         // Free result matrix (replace with your cleanup code)
 //         // free(result);
 //     }
 
