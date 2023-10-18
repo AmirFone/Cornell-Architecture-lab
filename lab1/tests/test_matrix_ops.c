@@ -126,3 +126,31 @@ void test_matmul_three_by_three_matrices(void)
     free(B);
     free(C);  
 }
+
+
+void test_matmul_five_by_five_matrices(void) {
+    // Setup
+    float A[5][5] = {{0,0,3,7,76}, {76,	7,67,67,6}, {76,	7,	67,	67,	 67},{ 6,	7,	67,	 6,	 76},{76,	7,	77,	76,	767}};
+    float B[5][5] = {{0,67,67,67,67}, {67,	67,	 6,	 7,67}, {67,	 7,	 7,	 0,	 0},{787, 8,0,0,78},8,	70,	 0,	 0,	 0};
+    float a[5][5]={{6318.000000, 5397.000000, 21.000000, 0.000000, 546.000000}, {57735.000000, 6986.000000, 5603.000000, 5141.000000, 10787.000000}, {58223.000000,11256.000000, 5603.000000, 5141.000000, 10787.000000},{10288,6708,913,451,1339},{71576,60398,5673,5141,11489}}; 
+    float *pA[] = {&A[0][0], &A[1][0], &A[2][0], &A[3][0], &A[4][0]};
+    float *pB[] = {&B[0][0], &B[1][0], &B[2][0], &B[3][0], &B[4][0]};
+    float *ans[]={&a[0][0], &a[1][0], &a[2][0], &a[3][0], &a[4][0]};
+    float **result = matmul_sparse(pA, pB, 5, 5, 5, 5);
+
+    // Print the result
+    // printf("Result of matrix multiplication is :\n");
+    for (int i=0; i<5; i++) {
+        for (int j=0; j<5; j++) {
+            // printf("%f ", result[i][j]);
+            UNITY_TEST_ASSERT_EQUAL_FLOAT(a[i][j], result[i][j], __LINE__, "Not What Expected");
+        }
+        // printf("\n");
+    }
+
+    // Free the memory allocated for the result array
+    for (int i=0; i<5; i++) {
+        free(result[i]);
+    }
+    free(result);
+}

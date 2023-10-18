@@ -31,6 +31,7 @@ int main(void) {
     RUN_TEST(test_matmul_square_matrices);
     RUN_TEST(test_matmul_incompatible_dimensions);
     RUN_TEST(test_matmul_three_by_three_matrices);
+    RUN_TEST(test_matmul_five_by_five_matrices);
 
     return UNITY_END();
 }
