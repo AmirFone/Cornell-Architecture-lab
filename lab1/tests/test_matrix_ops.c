@@ -136,7 +136,7 @@ void test_matmul_five_by_five_matrices(void) {
     float *pA[] = {&A[0][0], &A[1][0], &A[2][0], &A[3][0], &A[4][0]};
     float *pB[] = {&B[0][0], &B[1][0], &B[2][0], &B[3][0], &B[4][0]};
     float *ans[]={&a[0][0], &a[1][0], &a[2][0], &a[3][0], &a[4][0]};
-    float **result = matmul_sparse(pA, pB, 5, 5, 5, 5);
+    float **result = matmul(pA, pB, 5, 5, 5, 5);
 
     // Print the result
     // printf("Result of matrix multiplication is :\n");

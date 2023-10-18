@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
+clock_t start_time;
 //deprecated implementation of matmul
 float **matmul(float **A, float **B, int A_rows, int A_cols, int B_rows, int B_cols) {
     if (A_cols != B_rows) {
@@ -16,6 +16,7 @@ float **matmul(float **A, float **B, int A_rows, int A_cols, int B_rows, int B_c
     }
 
     // Matrix multiplication of A and B
+    start_time = clock();
     for (int i = 0; i < A_rows; i++) {
         for (int j = 0; j < B_cols; j++) {
             C[i][j] = 0.0;
@@ -59,29 +60,6 @@ float **matmul_blocking(float **A, float **B, int A_rows, int A_cols, int B_rows
 
 
 
-typedef struct {
-    int row, col;
-    float val;
-} Entry;
-
-Entry *create_csr(float **matrix, int rows, int cols) {
-    Entry *sparse_matrix = (Entry*)malloc(sizeof(Entry) * rows * cols);
-    int sparse_matrix_len = 0;
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if (matrix[i][j] != 0) {
-                sparse_matrix[sparse_matrix_len].row = i;
-                sparse_matrix[sparse_matrix_len].col = j;
-                sparse_matrix[sparse_matrix_len].val = matrix[i][j];
-                sparse_matrix_len++;
-            }
-        }
-    }
-
-    return sparse_matrix;
-}
-
 float **matmul_sparse(float **A, float **B, int A_rows, int A_cols, int B_rows, int B_cols) {
     typedef struct {
         int row, col;
@@ -106,7 +84,7 @@ float **matmul_sparse(float **A, float **B, int A_rows, int A_cols, int B_rows, 
             }
         }
     }
-    
+    start_time = clock();
     for (int i = 0; i < sparse_A_len; i++) {
         for (int j = 0; j < B_cols; j++) {
             if (B[sparse_A[i].col][j] != 0) {
@@ -117,81 +95,80 @@ float **matmul_sparse(float **A, float **B, int A_rows, int A_cols, int B_rows, 
     
     free(sparse_A);
     return result;
-}
+} 
 
 
-//========= code used for Profiling function (do not modify) ==============================
+// //========= code used for Profiling function (do not modify) ==============================
 
 
-// Function to generate sparse matrix
-float **generateSparseMatrix(int rows, int cols) {
-    float **matrix = (float **)malloc(rows * sizeof(float *));
-    for (int i = 0; i < rows; i++) {
-        matrix[i] = (float *)malloc(cols * sizeof(float));
-        for (int j = 0; j < cols; j++) {
-            // We generate a random number and make it sparse by making 
-            // 50% of the elements zero
-            float element = ((float)(rand() % 10) / 10.0) < 0.5 ? 0 : (float)(rand() % 10);
-            matrix[i][j] = element;
-        }
-    }
-    return matrix;
-}
+// // Function to generate sparse matrix
+// float **generateSparseMatrix(int rows, int cols) {
+//     float **matrix = (float **)malloc(rows * sizeof(float *));
+//     for (int i = 0; i < rows; i++) {
+//         matrix[i] = (float *)malloc(cols * sizeof(float));
+//         for (int j = 0; j < cols; j++) {
+//             // We generate a random number and make it sparse by making 
+//             // 50% of the elements zero
+//             float element = ((float)(rand() % 10) / 10.0) < 0.8 ? 0 : (float)(rand() % 10);
+//             matrix[i][j] = element;
+//         }
+//     }
+//     return matrix;
+// }
 
 
-int main() {
-    srand(time(NULL));
+// int main() {
+//     srand(time(NULL));
 
-    int A_rows = 100;  
-    int A_cols = 100;  
-    int B_rows = 100;  
-    int B_cols = 100;  
+//     int A_rows = 500;  
+//     int A_cols = 500;  
+//     int B_rows = 500;  
+//     int B_cols = 500;  
 
-    float **matrixA = generateSparseMatrix(A_rows, A_cols);
-    float **matrixB = generateSparseMatrix(B_rows, B_cols);
+//     float **matrixA = generateSparseMatrix(A_rows, A_cols);
+//     float **matrixB = generateSparseMatrix(B_rows, B_cols);
     
-    // Running function and timing it and saving that to a csv file
+//     // Running function and timing it and saving that to a csv file
 
-    FILE *csvFile = fopen("100x100_sparse.csv", "w");
-    if (!csvFile) {
-        perror("Failed to open CSV file for writing");
-        return 1;
-    }
+//     FILE *csvFile = fopen("100x100_sparse.csv", "w");
+//     if (!csvFile) {
+//         perror("Failed to open CSV file for writing");
+//         return 1;
+//     }
 
-    fprintf(csvFile, "Iteration,Matmul_Sparse Time (ms),Matmul Time (ms)\n");
+//     fprintf(csvFile, "Iteration,Matmul_Sparse Time (ms),Matmul Time (ms)\n");
 
-    for (int i = 0; i < 50; i++) {
-        // matmul_sparse
-        clock_t start_time = clock();
-        float **result_sparse = matmul_sparse(matrixA, matrixB, A_rows, A_cols, B_rows, B_cols);
-        clock_t end_time = clock();
+//     for (int i = 0; i < 1; i++) {
+//         // matmul_sparse
+//         float **result_sparse = matmul_sparse(matrixA, matrixB, A_rows, A_cols, B_rows, B_cols);
+//         // clock_t end_time = clock();
 
-        if (result_sparse == NULL) {
-            perror("Sparse Matrix multiplication error");
-            return 1;
-        }
+//         // if (result_sparse == NULL) {
+//         //     perror("Sparse Matrix multiplication error");
+//         //     return 1;
+//         // }
         
-        // Calculating the elapsed time in milliseconds
-        double elapsed_time_sparse = (double)(end_time - start_time) * 1000.0 / CLOCKS_PER_SEC;
+//         // Calculating the elapsed time in milliseconds
+//         // double elapsed_time_sparse = (double)(end_time - start_time) * 1000.0 / CLOCKS_PER_SEC;
 
-        // matmul
-        start_time = clock();
-        float **result = matmul(matrixA, matrixB, A_rows, A_cols, B_cols);
-        end_time = clock();
+//         // matmul
+//         // start_time = clock();
+//         // float **result = matmul(matrixA, matrixB, A_rows,A_cols,B_rows,B_cols);
+//         // end_time = clock();
 
-        if (result == NULL) {
-            perror("Matrix multiplication error");
-            return 1;
-        }
+//         // if (result == NULL) {
+//         //     perror("Matrix multiplication error");
+//         //     return 1;
+//         // }
         
-        double elapsed_time = (double)(end_time - start_time) * 1000.0 / CLOCKS_PER_SEC;
+//         //double elapsed_time = (double)(end_time - start_time) * 1000.0 / CLOCKS_PER_SEC;
 
-        fprintf(csvFile, "%d,%.2f,%.2f\n", i, elapsed_time_sparse, elapsed_time);
+//         // fprintf(csvFile, "%d,%.2f,%.2f\n", i, elapsed_time_sparse, elapsed_time);
 
-        free(result_sparse);
-        free(result);
-    }
-    fclose(csvFile);
+//         free(result_sparse);
+//         // free(result);
+//     }
+//     fclose(csvFile);
 
-    return 0;
-}
+//     return 0;
+// }

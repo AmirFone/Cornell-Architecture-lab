@@ -41,7 +41,7 @@ def main(num_iterations, command):
                 if key in line:
                     data[key].append(float('.'.join(re.findall(r'\d+\.\d+|\d+', line))))
         
-    filename = 'Block_matmul_profile_256.csv'
+    filename = '500by500_sparse.csv'
 
     with open(filename, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
