@@ -2,65 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-clock_t start_time;
-//deprecated implementation of matmul
-float **matmul(float **A, float **B, int A_rows, int A_cols, int B_rows, int B_cols) {
-    if (A_cols != B_rows) {
-        printf("Matrix dimensions incompatible for multiplication.\n");
-        return NULL;
-    }
-
-    float **C = (float **)malloc(A_rows * sizeof(float *));
-    for (int i = 0; i < A_rows; i++) {
-        C[i] = (float *)malloc(B_cols * sizeof(float));
-    }
-
-    // Matrix multiplication of A and B
-    start_time = clock();
-    for (int i = 0; i < A_rows; i++) {
-        for (int j = 0; j < B_cols; j++) {
-            C[i][j] = 0.0;
-            for (int k = 0; k < A_cols; k++) {
-                // row i of A * column j of B
-                C[i][j] += A[i][k] * B[k][j];
-            }
-        }
-    }
-    
-
-    return C;
-}
-
-// Deprecated optimized implementation of matmu using loop tiling 
-#define TILE_SIZE 128 //also tried  64, 256
-float **matmul_blocking(float **A, float **B, int A_rows, int A_cols, int B_rows, int B_cols) {
-    if (A_cols != B_rows) {
-        printf("Matrix dimensions incompatible for multiplication.\n");
-        return NULL;
-    }
-
-    // Allocating memory for the resulting matrix C
-    float** C = (float**) malloc(A_rows * sizeof(float*));
-
-    for (int i = 0; i < A_rows; i++) C[i] = (float*) calloc(B_cols, sizeof(float));
-    //implementing loop tiling 
-    //to optimize matrix multiplication by dividing the computation into smaller and cache-friendly tiles.
-    for(int t1 = 0; t1 < A_rows; t1 += TILE_SIZE)
-        for(int t2 = 0; t2 < B_cols; t2 += TILE_SIZE)
-            for(int t3 = 0; t3 < A_cols; t3 += TILE_SIZE)
-                for(int i = t1; i < t1+TILE_SIZE && i < A_rows; i++)
-                    for(int j = t2; j < t2+TILE_SIZE && j < B_cols; j++) {
-                        float sum = 0;
-                        for(int k = t3; k < t3+TILE_SIZE && k < A_cols; k++)
-                            sum += A[i][k] * B[k][j];
-                        C[i][j] += sum;
-                    }
-    return C;
-}
-
-
 
 float **matmul_sparse(float **A, float **B, int A_rows, int A_cols, int B_rows, int B_cols) {
+    // Structure to represent a sparse matrix entry 
     typedef struct {
         int row, col;
         float val;
@@ -70,10 +14,10 @@ float **matmul_sparse(float **A, float **B, int A_rows, int A_cols, int B_rows, 
     for (int i = 0; i < A_rows; i++) {
         result[i] = (float *)calloc(B_cols, sizeof(float));
     }
-    
+    // Allocate memory for the result matrix
     Entry *sparse_A = (Entry*) malloc(sizeof(Entry) * A_rows * A_cols);
     int sparse_A_len = 0;
-    
+     
     for (int i = 0; i < A_rows; i++) {
         for (int j = 0; j < A_cols; j++) {
             if (A[i][j] != 0) {
@@ -84,7 +28,7 @@ float **matmul_sparse(float **A, float **B, int A_rows, int A_cols, int B_rows, 
             }
         }
     }
-    start_time = clock();
+    // Perform sparse matrix multiplication
     for (int i = 0; i < sparse_A_len; i++) {
         for (int j = 0; j < B_cols; j++) {
             if (B[sparse_A[i].col][j] != 0) {
@@ -92,83 +36,7 @@ float **matmul_sparse(float **A, float **B, int A_rows, int A_cols, int B_rows, 
             }
         }
     }
-    
+// Free sparse matrix
     free(sparse_A);
     return result;
 } 
-
-
-// //========= code used for Profiling function (do not modify) ==============================
-
-
-// // Function to generate sparse matrix
-// float **generateSparseMatrix(int rows, int cols) {
-//     float **matrix = (float **)malloc(rows * sizeof(float *));
-//     for (int i = 0; i < rows; i++) {
-//         matrix[i] = (float *)malloc(cols * sizeof(float));
-//         for (int j = 0; j < cols; j++) {
-//             // We generate a random number and make it sparse by making 
-//             // 50% of the elements zero
-//             float element = ((float)(rand() % 10) / 10.0) < 0.8 ? 0 : (float)(rand() % 10);
-//             matrix[i][j] = element;
-//         }
-//     }
-//     return matrix;
-// }
-
-
-// int main() {
-//     srand(time(NULL));
-
-//     int A_rows = 500;  
-//     int A_cols = 500;  
-//     int B_rows = 500;  
-//     int B_cols = 500;  
-
-//     float **matrixA = generateSparseMatrix(A_rows, A_cols);
-//     float **matrixB = generateSparseMatrix(B_rows, B_cols);
-    
-//     // Running function and timing it and saving that to a csv file
-
-//     FILE *csvFile = fopen("100x100_sparse.csv", "w");
-//     if (!csvFile) {
-//         perror("Failed to open CSV file for writing");
-//         return 1;
-//     }
-
-//     fprintf(csvFile, "Iteration,Matmul_Sparse Time (ms),Matmul Time (ms)\n");
-
-//     for (int i = 0; i < 1; i++) {
-//         // matmul_sparse
-//         float **result_sparse = matmul_sparse(matrixA, matrixB, A_rows, A_cols, B_rows, B_cols);
-//         // clock_t end_time = clock();
-
-//         // if (result_sparse == NULL) {
-//         //     perror("Sparse Matrix multiplication error");
-//         //     return 1;
-//         // }
-        
-//         // Calculating the elapsed time in milliseconds
-//         // double elapsed_time_sparse = (double)(end_time - start_time) * 1000.0 / CLOCKS_PER_SEC;
-
-//         // matmul
-//         // start_time = clock();
-//         // float **result = matmul(matrixA, matrixB, A_rows,A_cols,B_rows,B_cols);
-//         // end_time = clock();
-
-//         // if (result == NULL) {
-//         //     perror("Matrix multiplication error");
-//         //     return 1;
-//         // }
-        
-//         //double elapsed_time = (double)(end_time - start_time) * 1000.0 / CLOCKS_PER_SEC;
-
-//         // fprintf(csvFile, "%d,%.2f,%.2f\n", i, elapsed_time_sparse, elapsed_time);
-
-//         free(result_sparse);
-//         // free(result);
-//     }
-//     fclose(csvFile);
-
-//     return 0;
-// }
