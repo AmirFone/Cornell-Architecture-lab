@@ -23,7 +23,7 @@ void test_matmul_square_matrices(void)
     }
 
     
-    float **C = matmul_blocking(A, B, 2, 2, 2, 2);
+    float **C = matmul_multithread(A, B, 2, 2, 2, 2);
 
     // Check expectations
     UNITY_TEST_ASSERT_EQUAL_FLOAT(9.0, C[0][0], __LINE__, "Expected 9.0");
@@ -65,7 +65,7 @@ void test_matmul_incompatible_dimensions(void)
     }
 
     // Run function under test
-    float **C = matmul_blocking(A, B, 2, 3, 2, 2);
+    float **C = matmul_multithread(A, B, 2, 3, 2, 2);
 
     // Check expectations
     UNITY_TEST_ASSERT_NULL(C, __LINE__, "Expected NULL!");
@@ -102,7 +102,7 @@ void test_matmul_three_by_three_matrices(void)
         B[i][2] = 1.0;
     }
 
-    float **C = matmul_blocking(A, B, 3, 3, 3, 3);
+    float **C = matmul_multithread(A, B, 3, 3, 3, 3);
 
     // Check expectations
     UNITY_TEST_ASSERT_EQUAL_FLOAT(39.0, C[0][0], __LINE__, "Expected 39.0");
@@ -136,7 +136,7 @@ void test_matmul_five_by_five_matrices(void) {
     float *pA[] = {&A[0][0], &A[1][0], &A[2][0], &A[3][0], &A[4][0]};
     float *pB[] = {&B[0][0], &B[1][0], &B[2][0], &B[3][0], &B[4][0]};
     float *ans[]={&a[0][0], &a[1][0], &a[2][0], &a[3][0], &a[4][0]};
-    float **result = matmul(pA, pB, 5, 5, 5, 5);
+    float **result = matmul_multithread(pA, pB, 5, 5, 5, 5);
 
     // Print the result
     // printf("Result of matrix multiplication is :\n");

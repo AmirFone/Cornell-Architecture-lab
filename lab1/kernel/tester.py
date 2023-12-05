@@ -14,7 +14,7 @@ def execute_srun():
 
 def run_command(command):
     try:
-        command= "python3 /usr/local/pmu-tools/pmu-tools/toplev.py --core S0-C0 -l1 -v --no-desc taskset -c 0" +" "+ command
+        command= "python3 /usr/local/pmu-tools/pmu-tools/toplev.py --core S0-C0,S0-C1,S0-C2,S0-C3,S0-C4,S0-C5,S0-C6,S0-C7 -l1 -v --no-desc taskset -c 0-7" +command
         output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT, text=True)
         print(output)
         return output
@@ -41,7 +41,7 @@ def main(num_iterations, command):
                 if key in line:
                     data[key].append(float('.'.join(re.findall(r'\d+\.\d+|\d+', line))))
         
-    filename = '500by500_sparse.csv'
+    filename = 'profiling_750x750_thread_8.csv'
 
     with open(filename, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
